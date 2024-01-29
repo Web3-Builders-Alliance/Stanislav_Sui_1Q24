@@ -19,7 +19,7 @@ const client = new SuiClient({ url: getFullnodeUrl("testnet") });
     //Split coins
     // let [coin] = txb.splitCoins(txb.gas, [1000]);
     //Add a transferObject transaction
-    // txb.transferObjects([coin, txb.gas], to);
+    // txb.transferObjects([coin], to);
     txb.transferObjects([txb.gas], to);
     let txid = await client.signAndExecuteTransactionBlock({
       signer: keypair,

@@ -156,7 +156,6 @@ module bank::bank_tests {
     fun claim_test_helper(scenario: &mut ts::Scenario, expected_amount: u64) {
         ts::next_tx(scenario, ADMIN);
         {
-            {
             let bank = ts::take_shared<Bank>(scenario);
             let owner_cap = ts::take_from_sender<OwnerCap>(scenario);
 
@@ -166,7 +165,6 @@ module bank::bank_tests {
             burn_for_testing(admin_coin);
             ts::return_to_sender(scenario, owner_cap);
             ts::return_shared(bank);
-        };
         }
     }
 
