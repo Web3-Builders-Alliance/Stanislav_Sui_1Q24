@@ -8,7 +8,10 @@
   },
   "scripts": {
     "publish": "ts-node ./src/publish.ts",
-    "newAccount": "ts-node ./src/newAccount.ts"
+    "newAccount": "ts-node ./src/newAccount.ts",
+    "newAccounts": "ts-node ./src/newAccounts.ts",
+    "deposit_borrow": "ts-node ./src/deposit_borrow.ts",
+    "repay_withdraw_destroy": "ts-node ./src/repay_withdraw_destroy.ts"
   },
   "dependencies": {
     "@mysten/sui.js": "^0.49.1",
