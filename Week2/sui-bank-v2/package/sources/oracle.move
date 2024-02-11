@@ -20,7 +20,7 @@ module sui_bank::oracle {
 
   // === Constants ===
 
-  const TIME_MARGIN: u64 = 5_000;
+  const TIME_MARGIN: u64 = 10 * 60; // in seconds, testnet update is rare
   const DEFAULT_AGREGATOR: address = @0x84d2b7e435d6e6a5b137bf6f78f34b2c5515ae61cd8591d5ff6cd121a21aa6b7;
 
   // === Structs ===
@@ -59,7 +59,7 @@ module sui_bank::oracle {
     assert!(value > 0, EPriceIsWrong);
     assert!(!neg, EPriceIsNegative);
 
-    let current_timestamp = clock::timestamp_ms(clock);
+    let current_timestamp = clock::timestamp_ms(clock) / 1000;
     assert!((latest_timestamp + TIME_MARGIN) > current_timestamp, ETimestampIsWrong);
 
     Price {
