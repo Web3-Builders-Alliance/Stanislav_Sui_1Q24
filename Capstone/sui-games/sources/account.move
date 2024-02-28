@@ -1,4 +1,4 @@
-module sui_games::user {
+module sui_games::account {
     // === Imports ===
 
     use std::string::{Self, String};
@@ -15,7 +15,7 @@ module sui_games::user {
 
     // === Structs ===
 
-    struct User has key, store {
+    struct Account has key, store {
         id: UID,
         name: String,
         // creation timestamp
@@ -24,16 +24,21 @@ module sui_games::user {
 
     // === Public-Mutative Functions ===
 
-    public fun create_account(name: vector<u8>, clock: &Clock, ctx: &mut TxContext): User {
-        User {
+    public fun create_account(name: vector<u8>, clock: &Clock, ctx: &mut TxContext): Account {
+        Account {
             id: object::new(ctx),
             name: string::utf8(name),
             created_at: clock::timestamp_ms(clock)
         }
     }
 
-    public fun change_name(self: &mut User, name: vector<u8>) {
+    public fun change_name(self: &mut Account, name: vector<u8>) {
         self.name = string::utf8(name);
+    }
+
+    public fun delete_account(self: Account) {
+        let Account { id, name: _, created_at: _ } = self;
+        object::delete(id);
     }
 
     // === Public-View Functions ===

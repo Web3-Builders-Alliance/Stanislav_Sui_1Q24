@@ -11,8 +11,7 @@ module sui_games::game {
     // use sui::event;
 
     use sui_games::games_pack::{Self, GamesPack};
-    use sui_games::user::{User};
-
+    use sui_games::account::{Account};
 
     // === Friends ===
 
@@ -59,7 +58,7 @@ module sui_games::game {
         _: GAME_TYPE,
         is_swapable: bool,
         game_state: STATE,
-        player1: &User,
+        player1: &Account,
         opponent: address,
         bet: Coin<SUI>,
         ctx: &mut TxContext
@@ -86,7 +85,7 @@ module sui_games::game {
 
     public fun cancel_game<GAME_TYPE, STATE>(
         self: Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         ctx: &mut TxContext
     ): (Coin<SUI>, STATE) {
         assert!(!self.is_started, EAlreadyStarted);
@@ -111,7 +110,7 @@ module sui_games::game {
 
     public fun join_game<GAME_TYPE, STATE: store>(
         self: &mut Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         bet: Coin<SUI>
     ) {
         assert!(coin::value(&bet) == balance::value(&self.bet), EWrongBet);
@@ -130,7 +129,7 @@ module sui_games::game {
     // is "_: GAME_TYPE" needed?
     public fun make_move<GAME_TYPE: drop, STATE>(
         self: &mut Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         _: GAME_TYPE
     ): (&mut STATE, u8) {
         assert!(self.is_started, ENotStarted);
@@ -152,7 +151,7 @@ module sui_games::game {
     // is "_: GAME_TYPE" needed?
     public fun swap_sides<GAME_TYPE: drop, STATE>(
         self: &mut Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         _: GAME_TYPE
     ): &mut STATE {
         assert!(self.is_started, ENotStarted); // not neccessary?
@@ -169,7 +168,7 @@ module sui_games::game {
 
     public fun give_up<GAME_TYPE: drop, STATE>(
         self: &mut Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         _: GAME_TYPE
     ): &mut STATE {
         assert!(self.is_started, ENotStarted);
@@ -182,7 +181,7 @@ module sui_games::game {
 
     public fun get_state_to_win<GAME_TYPE: drop, STATE>(
         self: &mut Game<GAME_TYPE, STATE>,
-        player: &User,
+        player: &Account,
         _: GAME_TYPE
     ): (&mut STATE, u8, WinnerRequest) {
         assert!(self.is_started, ENotStarted);

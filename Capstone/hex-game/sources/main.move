@@ -7,7 +7,7 @@ module hex_game::main {
 
     use sui_games::game::{Self, Game};
     use sui_games::games_pack::GamesPack;
-    use sui_games::user::User;
+    use sui_games::account::Account;
 
     use hex_game::board::{Self, Board};
 
@@ -29,7 +29,7 @@ module hex_game::main {
     // === Public-Mutative Functions ===
 
     #[allow(lint(share_owned))]
-    public fun create_game(games: &GamesPack, player: &User, opponent: address, stake: Coin<SUI>, ctx: &mut TxContext) {
+    public fun create_game(games: &GamesPack, player: &Account, opponent: address, stake: Coin<SUI>, ctx: &mut TxContext) {
         let board = board::create_board(BOARD_SIZE);
         game::create_game(
             games,
@@ -43,7 +43,7 @@ module hex_game::main {
         );
     }
 
-    public fun make_move(game: &mut Game<HexGame, Board>, player: &User, tile: u8) {
+    public fun make_move(game: &mut Game<HexGame, Board>, player: &Account, tile: u8) {
         let (board, player_num) = game::make_move(game, player, HexGame {});
 
         assert!(board::is_tile_free(board, tile), ETileAlreadyTaken);
@@ -51,15 +51,15 @@ module hex_game::main {
         board::set_tile(board, tile, player_num);
     }
 
-    public fun swap_sides(game: &mut Game<HexGame, Board>, player: &User) {
+    public fun swap_sides(game: &mut Game<HexGame, Board>, player: &Account) {
         game::swap_sides(game, player, HexGame {});
     }
 
-    public fun give_up(game: &mut Game<HexGame, Board>, player: &User) {
+    public fun give_up(game: &mut Game<HexGame, Board>, player: &Account) {
         game::give_up(game, player, HexGame {});
     }
 
-    public fun declare_win(game: &mut Game<HexGame, Board>, player: &User, path: vector<u8>) {
+    public fun declare_win(game: &mut Game<HexGame, Board>, player: &Account, path: vector<u8>) {
         let (board, player_num, winner_request) = sui_games::game::get_state_to_win(game, player, HexGame {});
 
         board::is_path_correct(board, &path, player_num);
