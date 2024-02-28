@@ -1,9 +1,13 @@
 module hex_game::main {
     // === Imports ===
 
-    use sui::object::{Self, UID};
     use sui::transfer;
     use sui::tx_context::{Self, TxContext};
+    use sui::coin::Coin;
+    use sui::sui::SUI;
+
+    use sui_games::main::{Self, Games, Game};
+    use sui_games::user::{User};
 
     use hex_game::board::{Self, Board};
 
@@ -11,12 +15,7 @@ module hex_game::main {
 
     // === Errors ===
 
-    const ESamePlayer: u64 = 0;
-    const EAlreadyJoined: u64 = 1;
-    const EAlreadyStarted: u64 = 2;
-    const EWrongOpponent: u64 = 3;
-    // const ENotYourTurn: u64 = 4;
-    // const EGameAlreadyOver: u64 = 5;
+    const ETileAlreadyTaken: u64 = 0;
 
     // === Constants ===
 
@@ -27,66 +26,54 @@ module hex_game::main {
 
     struct HexGame has drop {}
 
-    struct Game has key, store {
-        id: UID,
-        player1: address,
-        player2: address,
-        board: Board,
-        is_first_player_turn: bool,
-        is_started: bool,
-        winner_index: u8,
-    }
-
-    // struct Games has key {
-    //     id: UID,
-    //     available_games: Table<ID, Game>,
-    // }
-
     // === Public-Mutative Functions ===
 
     #[allow(lint(share_owned))]
-    public fun create_game(opponent: address, ctx: &mut TxContext) {
-        let player1 = tx_context::sender(ctx);
-        let player2 = opponent;
-        assert!(player1 != player2, ESamePlayer);
-        let game = create_game_intl(player1, player2, BOARD_SIZE, ctx);
-        transfer::share_object(game);
+    public fun create_game(games: &Games, player: &User, opponent: address, stake: Coin<SUI>, ctx: &mut TxContext) {
+        let board = board::create_board(BOARD_SIZE);
+        sui_games::main::create_game(
+            games,
+            HexGame {},
+            true,
+            board,
+            player,
+            opponent,
+            stake,
+            ctx
+        );
     }
 
-    public fun join_game(game: &mut Game, ctx: &mut TxContext) {
-        let player2 = tx_context::sender(ctx);
-        assert!(player2 != game.player1, EAlreadyJoined);
-        assert!(!game.is_started, EAlreadyStarted);
-        assert!(game.player2 == @0 || game.player2 == player2, EWrongOpponent);
-        game.player2 = player2;
-        game.is_started = true;
+    public fun make_move(game: &mut Game<HexGame, Board>, player: &User, tile: u8) {
+        let (board, player_num) = sui_games::main::make_move(game, player, HexGame {});
+
+        assert!(board::is_tile_free(board, tile), ETileAlreadyTaken);
+
+        board::set_tile(board, tile, player_num);
     }
 
-    // public fun make_move(game: &mut Game, tile: u8) {
+    public fun swap_sides(game: &mut Game<HexGame, Board>, player: &User) {
+        sui_games::main::swap_sides(game, player, HexGame {});
+    }
 
-    // }
+    public fun give_up(game: &mut Game<HexGame, Board>, player: &User) {
+        sui_games::main::give_up(game, player, HexGame {});
+    }
 
-    // public fun declare_win(game: &mut Game, tile: u8, path: vector<u8>) {
+    public fun declare_win(game: &mut Game<HexGame, Board>, player: &User, path: vector<u8>) {
+        let (board, player_num, winner_request) = sui_games::main::get_state_to_win(game, player, HexGame {});
 
-    // }
-
-    // public fun give_up(game: &mut Game) {
-
-    // }
-
-     // === Private Functions ===
-
-    fun create_game_intl(player1: address, player2: address, board_size: u8, ctx: &mut TxContext): Game {
-        Game {
-            id: object::new(ctx),
-            player1: player1,
-            player2: player2,
-            board: board::create_board(board_size),
-            is_first_player_turn: true,
-            is_started: false,
-            winner_index: 0,
-        }
+        board::is_path_correct(board, &path, player_num);
+        sui_games::main::declare_win(game, player, winner_request, HexGame {});
     }
 
 
+    // === Public-View Functions ===
+
+    // === Admin Functions ===
+
+    // === Public-Friend Functions ===
+
+    // === Private Functions ===
+
+    // === Test Functions ===
 }

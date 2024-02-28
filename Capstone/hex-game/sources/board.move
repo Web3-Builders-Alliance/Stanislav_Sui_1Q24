@@ -9,7 +9,7 @@ module hex_game::board {
 
     // === Structs ===
 
-    struct Board has store {
+    struct Board has store, drop {
         size: u8,
         field: vector<u8>,
     }
@@ -25,6 +25,14 @@ module hex_game::board {
         };
 
         board
+    }
+
+    public(friend) fun is_tile_free(self: &Board, tile: u8): bool {
+        *vector::borrow(&self.field, (tile as u64)) == 0
+    }
+
+    public(friend) fun set_tile(self: &mut Board, tile: u8, player_num: u8) {
+        *vector::borrow_mut(&mut self.field, (tile as u64)) = player_num;
     }
 
     public(friend) fun is_path_correct(self: &Board, path: &vector<u8>, player_num: u8): bool {
