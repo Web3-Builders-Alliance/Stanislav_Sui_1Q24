@@ -4,6 +4,7 @@ module hex_game::main {
     use sui::tx_context::{TxContext};
     use sui::coin::Coin;
     use sui::sui::SUI;
+    use sui::clock::Clock;
 
     use sui_games::game::{Self, Game};
     use sui_games::games_pack::GamesPack;
@@ -28,8 +29,14 @@ module hex_game::main {
 
     // === Public-Mutative Functions ===
 
-    #[allow(lint(share_owned))]
-    public fun create_game(games: &GamesPack, player: &Account, opponent: address, stake: Coin<SUI>, ctx: &mut TxContext) {
+    public fun create_game(
+        games: &GamesPack,
+        player: &Account,
+        opponent: address,
+        stake: Coin<SUI>,
+        clock: &Clock,
+        ctx: &mut TxContext
+    ) {
         let board = board::create_board(BOARD_SIZE);
         game::create_game(
             games,
@@ -39,6 +46,7 @@ module hex_game::main {
             player,
             opponent,
             stake,
+            clock,
             ctx
         );
     }
