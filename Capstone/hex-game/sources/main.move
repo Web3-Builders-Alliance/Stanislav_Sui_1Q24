@@ -30,7 +30,7 @@ module hex_game::main {
     // === Public-Mutative Functions ===
 
     public fun create_game(
-        games: &GamesPack,
+        games: &mut GamesPack,
         player: &Account,
         opponent: address,
         stake: Coin<SUI>,
@@ -67,11 +67,11 @@ module hex_game::main {
         game::give_up(game, player, HexGame {});
     }
 
-    public fun declare_win(game: &mut Game<HexGame, Board>, player: &Account, path: vector<u8>) {
+    public fun declare_win(game: &mut Game<HexGame, Board>, games_pack: &mut GamesPack, player: &Account, path: vector<u8>) {
         let (board, player_num, winner_request) = sui_games::game::get_state_to_win(game, player, HexGame {});
 
         board::is_path_correct(board, &path, player_num);
-        game::declare_win(game, winner_request, HexGame {});
+        game::declare_win(game, games_pack, winner_request, HexGame {});
     }
 
 
