@@ -48,7 +48,7 @@ module hex_game::board_tests {
              0, 1, 1, 0, 1,
               1, 0, 1, 1, 0,
                1, 0, 0, 0, 0,
-                1, 0, 1, 0, 0,
+                1, 1, 1, 0, 0,
         ];
 
         let size = 5;
@@ -56,6 +56,24 @@ module hex_game::board_tests {
         let board = board::create_board_for_testing(size, field);
         let path = vector[3, 4, 9, 13, 12, 7, 6, 10, 15, 20];
         assert_eq(board::is_path_correct(&board, &path, 1), true);
+
+        let path = vector[4, 9, 13, 12, 7, 6, 10, 15, 20];
+        assert_eq(board::is_path_correct(&board, &path, 1), true);
+
+        let path = vector[9, 13, 12, 7, 6, 10, 15, 20];
+        assert_eq(board::is_path_correct(&board, &path, 1), false);
+
+        let path = vector[3, 4, 9, 13, 12, 7, 6, 10, 15];
+        assert_eq(board::is_path_correct(&board, &path, 1), false);
+
+        let path = vector[3, 9, 13, 12, 7, 6, 10, 15, 20];
+        assert_eq(board::is_path_correct(&board, &path, 1), false);
+
+        let path = vector[3, 8, 13, 12, 7, 6, 10, 15, 20];
+        assert_eq(board::is_path_correct(&board, &path, 1), false);
+
+        let path = vector[3, 4, 9, 13, 12, 7, 6, 10, 15, 21];
+        assert_eq(board::is_path_correct(&board, &path, 1), false);
     }
 
         #[test]

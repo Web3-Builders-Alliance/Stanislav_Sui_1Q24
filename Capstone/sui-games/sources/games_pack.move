@@ -32,7 +32,7 @@ module sui_games::games_pack {
         games_played: u64
     }
 
-    struct PlayerStats has store, drop {
+    struct PlayerScores has store, drop {
         wins: u64,
         losses: u64
     }
@@ -40,8 +40,8 @@ module sui_games::games_pack {
     struct GamesPack has key {
         id: UID,
         game_types: VecMap<TypeName, GameStats>,
-        // game_type -> (account_address -> PlayerStats)
-        scores: VecMap<TypeName, Table<address, PlayerStats>>,
+        // game_type -> (account_address -> PlayerScores)
+        scores: VecMap<TypeName, Table<address, PlayerScores>>,
         // game_type -> game_ids
         games: VecMap<TypeName, Table<ID, bool>>
     }
@@ -123,7 +123,7 @@ module sui_games::games_pack {
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
-            table::add(player_stats, player, PlayerStats {wins: 1, losses: 0});
+            table::add(player_stats, player, PlayerScores {wins: 1, losses: 0});
         } else {
             let player_stats = table::borrow_mut(player_stats, player);
             player_stats.wins = player_stats.wins + 1;
@@ -135,7 +135,7 @@ module sui_games::games_pack {
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
-            table::add(player_stats, player, PlayerStats {wins: 0, losses: 1});
+            table::add(player_stats, player, PlayerScores {wins: 0, losses: 1});
         } else {
             let player_stats = table::borrow_mut(player_stats, player);
             player_stats.losses = player_stats.losses + 1;
@@ -145,4 +145,9 @@ module sui_games::games_pack {
     // === Private Functions ===
 
     // === Test Functions ===
+
+    #[test_only]
+    public fun init_for_testing(ctx: &mut TxContext) {
+        init(ctx);
+    }
 }

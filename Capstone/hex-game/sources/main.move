@@ -17,6 +17,7 @@ module hex_game::main {
     // === Errors ===
 
     const ETileAlreadyTaken: u64 = 0;
+    const EWrongPath: u64 = 1;
 
     // === Constants ===
 
@@ -33,7 +34,7 @@ module hex_game::main {
         games: &mut GamesPack,
         player: &Account,
         opponent: address,
-        stake: Coin<SUI>,
+        bet: Coin<SUI>,
         clock: &Clock,
         ctx: &mut TxContext
     ) {
@@ -45,7 +46,7 @@ module hex_game::main {
             board,
             player,
             opponent,
-            stake,
+            bet,
             clock,
             ctx
         );
@@ -70,7 +71,7 @@ module hex_game::main {
     public fun declare_win(game: &mut Game<HexGame, Board>, games_pack: &mut GamesPack, player: &Account, path: vector<u8>) {
         let (board, player_num, winner_request) = sui_games::game::get_state_to_win(game, player, HexGame {});
 
-        board::is_path_correct(board, &path, player_num);
+        assert!(board::is_path_correct(board, &path, player_num), EWrongPath);
         game::declare_win(game, games_pack, winner_request, HexGame {});
     }
 

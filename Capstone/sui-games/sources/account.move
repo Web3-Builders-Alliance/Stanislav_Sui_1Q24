@@ -43,6 +43,14 @@ module sui_games::account {
 
     // === Public-View Functions ===
 
+    public fun name(self: &Account): String {
+        self.name
+    }
+
+    public fun created_at(self: &Account): u64 {
+        self.created_at
+    }
+
     // === Admin Functions ===
 
     // === Public-Friend Functions ===
