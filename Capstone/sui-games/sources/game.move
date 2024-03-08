@@ -244,7 +244,7 @@ module sui_games::game {
         self: &mut Game<GAME_TYPE, STATE>,
         player: &Account,
         _: GAME_TYPE
-    ): (&mut STATE, u8, WinnerRequest) {
+    ): (&STATE, u8, WinnerRequest) {
         assert!(self.is_started, ENotStarted);
         assert!(self.winner_index == 0, EGameAlreadyOver);
         let player = object::id_address(player);
@@ -254,7 +254,7 @@ module sui_games::game {
             game_id: object::uid_to_inner(&self.id),
             winner_index: player_num
         };
-        (&mut self.game_state, player_num, winner_request)
+        (&self.game_state, player_num, winner_request)
     }
 
     // is "_: GAME_TYPE" needed?
