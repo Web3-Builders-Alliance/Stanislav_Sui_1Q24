@@ -2,7 +2,7 @@
 
 [move]
 version = 0
-manifest_digest = "8CF50824A27C3C95202A0FF7246E502357CDBE604E29C973758C1BB4F35C8091"
+manifest_digest = "5FFD49FE6C0C1126C88156105CB2DC8B8B30085F12A96622B318738C9C492F80"
 deps_digest = "3C4103934B1E040BB6B23F1D610B4EF9F2F1166A50A104EADCF77467C004C600"
 
 dependencies = [
@@ -29,8 +29,3 @@ source = { local = "..\\sui-games" }
 dependencies = [
   { name = "Sui" },
 ]
-
-[move.toolchain-version]
-compiler-version = "1.20.0"
-edition = "legacy"
-flavor = "sui"
