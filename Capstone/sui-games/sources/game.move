@@ -9,7 +9,6 @@ module sui_games::game {
     use sui::balance::{Self, Balance};
     use sui::sui::SUI;
     use sui::event;
-    use std::type_name::{Self, TypeName};
 
     use sui_games::games_pack::{Self, GamesPack};
     use sui_games::account::{Account};
@@ -56,35 +55,32 @@ module sui_games::game {
     }
 
     // === Events ===
-    struct GameCreated has copy, drop {
-        id: ID,
-        game_type: TypeName
+    struct GameCreated<phantom GAME_TYPE> has copy, drop {
+        game_id: ID
     }
 
-    struct GameCancelled has copy, drop {
-        id: ID,
-        game_type: TypeName
+    struct GameCancelled<phantom GAME_TYPE> has copy, drop {
+        game_id: ID
     }
-    struct GameStarted has copy, drop {
-        id: ID,
+    struct GameStarted<phantom GAME_TYPE> has copy, drop {
+        game_id: ID
     }
-    struct GameEnded has copy, drop {
-        id: ID,
+    struct GameEnded<phantom GAME_TYPE> has copy, drop {
+        game_id: ID,
         winner_index: u8
     }
 
-    struct GameDeleted has copy, drop {
-        id: ID,
-        game_type: TypeName
+    struct GameDeleted<phantom GAME_TYPE> has copy, drop {
+        game_id: ID
     }
 
-    struct GameMove has copy, drop {
-        id: ID,
+    struct GameMove<phantom GAME_TYPE> has copy, drop {
+        game_id: ID,
         player_num: u8,
     }
 
-    struct GameSwapSides has copy, drop {
-        id: ID,
+    struct GameSwapSides<phantom GAME_TYPE> has copy, drop {
+        game_id: ID,
     }
 
     // === Public-Mutative Functions ===
@@ -118,9 +114,8 @@ module sui_games::game {
             game_state,
         };
         games_pack::add_game<GAME_TYPE>(games_pack, object::uid_to_inner(&game.id));
-        event::emit(GameCreated {
-            id: object::uid_to_inner(&game.id),
-            game_type: type_name::get<GAME_TYPE>()
+        event::emit(GameCreated<GAME_TYPE> {
+            game_id: object::uid_to_inner(&game.id)
         });
         // maybe return here, not share ??? -> need to add `store`
         transfer::share_object(game);
@@ -138,9 +133,8 @@ module sui_games::game {
 
         games_pack::remove_game<GAME_TYPE>(games_pack, object::uid_to_inner(&self.id));
 
-        event::emit(GameCancelled {
-            id: object::uid_to_inner(&self.id),
-            game_type: type_name::get<GAME_TYPE>()
+        event::emit(GameCancelled<GAME_TYPE> {
+            game_id: object::uid_to_inner(&self.id)
         });
 
         let Game {
@@ -177,7 +171,7 @@ module sui_games::game {
         };
         balance::join(&mut self.bet, coin::into_balance(bet));
         self.is_started = true;
-        event::emit(GameStarted { id: object::uid_to_inner(&self.id) });
+        event::emit(GameStarted<GAME_TYPE> { game_id: object::uid_to_inner(&self.id) });
     }
 
     public fun make_move<GAME_TYPE: drop, STATE>(
@@ -197,8 +191,10 @@ module sui_games::game {
 
         let cur_player_num = if (self.is_first_player_turn) 1 else 2;
 
-        event::emit(GameMove { id: object::uid_to_inner(&self.id), player_num: cur_player_num });
-
+        event::emit(GameMove<GAME_TYPE> {
+            game_id: object::uid_to_inner(&self.id),
+            player_num: cur_player_num
+        });
         self.is_first_player_turn = !self.is_first_player_turn;
         (&mut self.game_state, cur_player_num)
     }
@@ -217,7 +213,7 @@ module sui_games::game {
         self.player2 = self.player1;
         self.player1 = player;
 
-        event::emit(GameSwapSides { id: object::uid_to_inner(&self.id) });
+        event::emit(GameSwapSides<GAME_TYPE> { game_id: object::uid_to_inner(&self.id) });
 
         &mut self.game_state
     }
@@ -233,8 +229,8 @@ module sui_games::game {
         assert!(player == self.player1 || player == self.player2, EWrongPlayer);
         self.winner_index = if (player == self.player1) 2 else 1;
         
-        event::emit(GameEnded {
-            id: object::uid_to_inner(&self.id),
+        event::emit(GameEnded<GAME_TYPE> {
+            game_id: object::uid_to_inner(&self.id),
             winner_index: self.winner_index
         });
         &mut self.game_state
@@ -276,8 +272,8 @@ module sui_games::game {
             games_pack::player_lose<GAME_TYPE>(games_pack, self.player1);
         };
 
-        event::emit(GameEnded { 
-            id: object::uid_to_inner(&self.id),
+        event::emit(GameEnded<GAME_TYPE> {
+            game_id: object::uid_to_inner(&self.id),
             winner_index: self.winner_index
         });
 
@@ -315,10 +311,7 @@ module sui_games::game {
 
         games_pack::remove_game<GAME_TYPE>(games_pack, object::uid_to_inner(&self.id));
 
-        event::emit(GameDeleted {
-            id: object::uid_to_inner(&self.id),
-            game_type: type_name::get<GAME_TYPE>()
-        });
+        event::emit(GameDeleted<GAME_TYPE> {game_id: object::uid_to_inner(&self.id)});
 
         let Game {
             id,
