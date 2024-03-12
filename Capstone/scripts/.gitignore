@@ -1,0 +1,4 @@
+/node_modules
+.env
+created_sg.json
+created_hex.json
