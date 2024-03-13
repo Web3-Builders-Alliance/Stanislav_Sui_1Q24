@@ -14,6 +14,7 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
         suigamesPackageId: DEVNET_SUIGAMES_PACKAGE_ID,
         gamespackId: DEVNET_GAMESPACK_ID,
         hexgamePackageId: DEVNET_HEXGAME_PACKAGE_ID,
+        hexgameType: DEVNET_HEXGAME_PACKAGE_ID + "::main::HexGame",
       },
     },
   });

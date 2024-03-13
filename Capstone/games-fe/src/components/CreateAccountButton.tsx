@@ -147,7 +147,7 @@ export default function CreateAccountButton() {
 
   return (
     <>
-      <UserAccount id={data.data[0].data!.objectId} />
+      <UserAccount id={data.data[0].data!.objectId} className="ml-2" />
     </>
   );
 }

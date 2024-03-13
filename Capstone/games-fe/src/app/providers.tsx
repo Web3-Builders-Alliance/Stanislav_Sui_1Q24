@@ -5,6 +5,7 @@ import {
 } from "@mysten/dapp-kit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { networkConfig } from "@/utils/networkConfig";
+import {NextUIProvider} from "@nextui-org/react";
 
 const queryClient = new QueryClient();
 
@@ -14,10 +15,12 @@ export interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
+    <NextUIProvider>
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
         <WalletProvider autoConnect>{children}</WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
+    </NextUIProvider>
   );
 }

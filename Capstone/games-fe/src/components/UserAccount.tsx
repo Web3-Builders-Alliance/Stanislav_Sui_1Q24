@@ -1,9 +1,15 @@
 import { getAccountFields } from "@/utils/objects";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
 import { formatAddress } from "@mysten/sui.js/utils";
-import { User } from "@nextui-org/react";
+import { Snippet, User } from "@nextui-org/react";
 
-export default function UserAccount({ id }: { id: string }) {
+export default function UserAccount({
+  id,
+  className,
+}: {
+  id: string;
+  className?: string;
+}) {
   const { data, isPending, error, refetch } = useSuiClientQuery("getObject", {
     id,
     options: {
@@ -20,12 +26,14 @@ export default function UserAccount({ id }: { id: string }) {
 
   return (
     <User
-      name={getAccountFields(data?.data)?.name}
-      description={formatAddress(id)}
+      name={getAccountFields(data.data)?.name}
+      description={
+        <Snippet hideSymbol variant="flat" size="sm" codeString={id}>
+          {formatAddress(id)}
+        </Snippet>
+      }
       avatarProps={{ name: "" }}
-      className="ml-2"
+      className={className}
     />
-    // <p className="text-md ml-2">{getAccountFields(data?.data)?.name}</p>
-    // <div>{JSON.stringify(getAccountFields(data?.data))}</div>
   );
 }
