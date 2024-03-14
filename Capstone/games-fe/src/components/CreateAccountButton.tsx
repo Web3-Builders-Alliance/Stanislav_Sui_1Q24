@@ -1,7 +1,6 @@
 import { useNetworkVariable } from "@/utils/networkConfig";
 import {
   useCurrentAccount,
-  useSuiClientQuery,
   useSignAndExecuteTransactionBlock,
   useSuiClient,
 } from "@mysten/dapp-kit";
@@ -20,8 +19,9 @@ import {
   useDisclosure,
   Input,
 } from "@nextui-org/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import UserAccount from "./UserAccount";
+import { AccountContext } from "@/context/account-context";
 
 export default function CreateAccountButton() {
   const currentAccount = useCurrentAccount();
@@ -29,24 +29,11 @@ export default function CreateAccountButton() {
   const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
   const client = useSuiClient();
 
+  const { accountId, refetch } = useContext(AccountContext);
+
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [name, setName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-
-  const {
-    data,
-    // isPending,
-    // isError,
-    // error,
-    // isFetching,
-    refetch,
-  } = useSuiClientQuery("getOwnedObjects", {
-    owner: currentAccount?.address!,
-    filter: {
-      StructType: `${suigamesPackageId}::account::Account`,
-    },
-    // options: { showType: true },
-  });
 
   const createAccount = async () => {
     if (!currentAccount) {
@@ -101,7 +88,7 @@ export default function CreateAccountButton() {
 
   if (!currentAccount || currentAccount.chains[0] !== SUI_DEVNET_CHAIN) return;
 
-  if (data === undefined || data.data.length === 0) {
+  if (!accountId) {
     return (
       <>
         <Button
@@ -132,9 +119,7 @@ export default function CreateAccountButton() {
               <Button
                 color="primary"
                 isLoading={isCreating}
-                onPress={() => {
-                  createAccount();
-                }}
+                onPress={createAccount}
               >
                 Create
               </Button>
@@ -147,7 +132,7 @@ export default function CreateAccountButton() {
 
   return (
     <>
-      <UserAccount id={data.data[0].data!.objectId} className="ml-2" />
+      <UserAccount id={accountId} className="ml-2" />
     </>
   );
 }

@@ -1,16 +1,27 @@
 import { useNetworkVariable } from "@/utils/networkConfig";
 import {
   useCurrentAccount,
-  useSuiClientQuery,
   useSignAndExecuteTransactionBlock,
   useSuiClient,
 } from "@mysten/dapp-kit";
 import { SUI_DEVNET_CHAIN } from "@mysten/wallet-standard";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
+import { MIST_PER_SUI, SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
 
-import { Button } from "@nextui-org/react";
-import { useState } from "react";
+import {
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Radio,
+  RadioGroup,
+  useDisclosure,
+} from "@nextui-org/react";
+import { useContext, useState } from "react";
+import { AccountContext } from "@/context/account-context";
 
 export default function CreateGameButton({
   classname,
@@ -20,18 +31,16 @@ export default function CreateGameButton({
   onCreate?: () => void;
 }) {
   const currentAccount = useCurrentAccount();
-  const suigamesPackageId = useNetworkVariable("suigamesPackageId");
   const hexPackageId = useNetworkVariable("hexgamePackageId");
   const gamesPackId = useNetworkVariable("gamespackId");
   const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
   const client = useSuiClient();
 
-  const { data } = useSuiClientQuery("getOwnedObjects", {
-    owner: currentAccount?.address!,
-    filter: {
-      StructType: `${suigamesPackageId}::account::Account`,
-    },
-  });
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [bet, setBet] = useState("0");
+  const [gameType, setGameType] = useState("hex");
+
+  const { accountId } = useContext(AccountContext);
 
   const [isCreating, setIsCreating] = useState(false);
 
@@ -40,7 +49,15 @@ export default function CreateGameButton({
       return;
     }
 
-    if (!data) {
+    let packageId;
+    if (gameType === "hex") {
+      packageId = hexPackageId;
+    } else {
+      return;
+    }
+
+    const betNum = parseFloat(bet);
+    if (Number.isNaN(betNum) || betNum < 0) {
       return;
     }
 
@@ -48,8 +65,7 @@ export default function CreateGameButton({
 
     const txb = new TransactionBlock();
 
-    let accountId = data.data[0].data!.objectId;
-    let [coin] = txb.splitCoins(txb.gas, [0]);
+    let [coin] = txb.splitCoins(txb.gas, [BigInt(betNum) * MIST_PER_SUI]);
 
     txb.moveCall({
       arguments: [
@@ -61,7 +77,7 @@ export default function CreateGameButton({
         coin,
         txb.object(SUI_CLOCK_OBJECT_ID),
       ],
-      target: `${hexPackageId}::main::create_game`,
+      target: `${packageId}::main::create_game`,
     });
 
     signAndExecute(
@@ -97,11 +113,49 @@ export default function CreateGameButton({
 
   if (!currentAccount || currentAccount.chains[0] !== SUI_DEVNET_CHAIN) return;
 
+  if (!accountId) return;
+
   return (
     <>
-      <Button onPress={createGame} color="primary" isLoading={isCreating} className={classname}>
+      <Button onPress={onOpen} color="primary" className={classname}>
         Create Game
       </Button>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top">
+        <ModalContent>
+          <ModalHeader>Create Game</ModalHeader>
+          <ModalBody>
+            <RadioGroup
+              label="Select game type"
+              value={gameType}
+              onValueChange={setGameType}
+            >
+              <Radio value="hex">Hex Board Game</Radio>
+              <Radio value="tic-tac-toe" isDisabled>
+                {/* Tic-Tac-Toe */}
+                Another game
+              </Radio>
+            </RadioGroup>
+            <Input
+              autoFocus
+              type="number"
+              label="Bet"
+              placeholder="0"
+              variant="bordered"
+              value={bet}
+              endContent="Sui"
+              onValueChange={setBet}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" onPress={onClose}>
+              Cancel
+            </Button>
+            <Button color="primary" isLoading={isCreating} onPress={createGame}>
+              Create
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 }

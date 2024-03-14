@@ -10,22 +10,22 @@ export default function Home() {
 
   return (
     <main>
-      <CreateGameButton classname="mb-2" />
-      <GamesList />
       {!currentAccount && (
-        <div>
+        <>
           <p>Connect your wallet</p>
-        </div>
+        </>
       )}
       {currentAccount && currentAccount.chains[0] !== SUI_DEVNET_CHAIN && (
-        <div>
+        <>
           <p>Please connect to Sui Devnet</p>
-        </div>
+        </>
       )}
       {currentAccount && currentAccount.chains[0] === SUI_DEVNET_CHAIN && (
-        <div>
+        <>
           <p>Welcome to Sui Games</p>
-        </div>
+          <CreateGameButton classname="mb-2" />
+          <GamesList />
+        </>
       )}
     </main>
   );

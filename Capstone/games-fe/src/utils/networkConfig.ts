@@ -15,6 +15,7 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
         gamespackId: DEVNET_GAMESPACK_ID,
         hexgamePackageId: DEVNET_HEXGAME_PACKAGE_ID,
         hexgameType: DEVNET_HEXGAME_PACKAGE_ID + "::main::HexGame",
+        hexgameBoardType: DEVNET_HEXGAME_PACKAGE_ID + "::board::Board",
       },
     },
   });
