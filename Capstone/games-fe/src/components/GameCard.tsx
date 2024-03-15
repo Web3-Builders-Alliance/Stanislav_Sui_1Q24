@@ -8,7 +8,7 @@ import {
   useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { MIST_PER_SUI } from "@mysten/sui.js/utils";
+import { MIST_PER_SUI, normalizeSuiAddress } from "@mysten/sui.js/utils";
 import { Button, Card, CardBody, Link } from "@nextui-org/react";
 
 import { useContext, useEffect, useState } from "react";
@@ -60,10 +60,7 @@ export default function GameCard({ id }: { id: string }) {
       }
 
       let player2_id = game.player2;
-      if (
-        player2_id !==
-        "0x0000000000000000000000000000000000000000000000000000000000000000"
-      ) {
+      if (player2_id !== normalizeSuiAddress("0")) {
         let player2Account = await client.getObject({
           id: player2_id,
           options: {
@@ -261,28 +258,23 @@ export default function GameCard({ id }: { id: string }) {
   return (
     <Card>
       <CardBody>
-        {/* <p>{JSON.stringify(getGameFields(data.data)?.game_state)}</p> */}
-        {/* <p>
-          {JSON.stringify(
-            getBoardFromState(getGameFields(data.data)?.game_state!)
-          )}
-        </p> */}
         {gameType === hexgameType && (
           <h1 className="text-center">Hex Board Game</h1>
         )}
         <p>
-          {playerName1} vs {playerName2 ? playerName2 : "???"}
+          {playerName1 ? playerName1 : "???"} vs{" "}
+          {playerName2 ? playerName2 : "???"}
         </p>
         <p>Bet: {game?.bet! / Number(MIST_PER_SUI)} Sui</p>
         <p>Started: {game?.is_started ? "yes" : "no"}</p>
+        <p>Ended: {game?.winner_index !== 0 ? "yes" : "no"}</p>
         {currentAccountId &&
           !game?.is_started &&
           (game?.player1 === currentAccountId ? (
             <Button onPress={cancelGame}>Cancel game</Button>
           ) : (
             (game?.player2 === currentAccountId ||
-              game?.player2 ===
-                "0x0000000000000000000000000000000000000000000000000000000000000000") && (
+              game?.player2 === normalizeSuiAddress("0")) && (
               <Button onPress={joinGame}>Join game</Button>
             )
           ))}
@@ -291,14 +283,15 @@ export default function GameCard({ id }: { id: string }) {
             <p>
               Winner: {game?.winner_index === 1 ? playerName1 : playerName2}
             </p>
-            {(game?.winner_index === 1 && game?.player1 === currentAccountId) ||
+            {((game?.winner_index === 1 &&
+              game?.player1 === currentAccountId) ||
               (game?.winner_index === 2 &&
-                game?.player2 === currentAccountId &&
-                (game?.bet > 0 ? (
-                  <Button onPress={withdraw}>Withdraw</Button>
-                ) : (
-                  <Button onPress={deleteGame}>Delete game</Button>
-                )))}
+                game?.player2 === currentAccountId)) &&
+              (game?.bet > 0 ? (
+                <Button onPress={withdraw}>Withdraw</Button>
+              ) : (
+                <Button onPress={deleteGame}>Delete game</Button>
+              ))}
           </>
         )}
         <Link href={`/${id}`}> Open game </Link>

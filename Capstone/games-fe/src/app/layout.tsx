@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ background: "#ebf0fa" }}>
+    <html lang="en" style={{ background: "#ebf0fa", zoom: "125%" }}>
       <body className={inter.className}>
         <Providers>
           <TopNav />

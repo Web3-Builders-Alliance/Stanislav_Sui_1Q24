@@ -6,7 +6,11 @@ import {
 } from "@mysten/dapp-kit";
 import { SUI_DEVNET_CHAIN } from "@mysten/wallet-standard";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { MIST_PER_SUI, SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
+import {
+  MIST_PER_SUI,
+  SUI_CLOCK_OBJECT_ID,
+  normalizeSuiAddress,
+} from "@mysten/sui.js/utils";
 
 import {
   Button,
@@ -65,15 +69,13 @@ export default function CreateGameButton({
 
     const txb = new TransactionBlock();
 
-    let [coin] = txb.splitCoins(txb.gas, [BigInt(betNum) * MIST_PER_SUI]);
+    let [coin] = txb.splitCoins(txb.gas, [betNum * Number(MIST_PER_SUI)]);
 
     txb.moveCall({
       arguments: [
         txb.object(gamesPackId),
         txb.object(accountId),
-        txb.pure(
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ),
+        txb.pure(normalizeSuiAddress("0")),
         coin,
         txb.object(SUI_CLOCK_OBJECT_ID),
       ],
@@ -113,7 +115,12 @@ export default function CreateGameButton({
 
   if (!currentAccount || currentAccount.chains[0] !== SUI_DEVNET_CHAIN) return;
 
-  if (!accountId) return;
+  if (!accountId)
+    return (
+      <>
+        <p>Please create account</p>
+      </>
+    );
 
   return (
     <>

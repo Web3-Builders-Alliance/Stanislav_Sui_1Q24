@@ -29,9 +29,11 @@ export default function HexField({
   hexes.push(
     <polygon
       key={0}
-      points={`${width / 2},0 ${width * (cols - 1) + width + width / 2},0 ${
-        width * (cols - 1) + width + width / 2
-      },${hexSize} ${width / 2},${hexSize}`}
+      points={`${width / 2},0
+      ${width * (cols - 1) + width + width / 2},0
+      ${width * cols},${height}
+      ${width},${height}
+      ${width / 4},${height / 2} `}
       stroke={player1Color}
       fill={player1Color}
     />
@@ -40,13 +42,13 @@ export default function HexField({
   hexes.push(
     <polygon
       key={1}
-      points={`${width * (cols - 1) + (width / 2) * rows + width},${
-        height * (rows + 1)
-      } ${(width / 2) * rows},${height * (rows + 1)} ${(width / 2) * rows},${
-        height * (rows + 1) - hexSize
-      } ${width * (cols - 1) + (width / 2) * rows + width},${
-        height * (rows + 1) - hexSize
-      }`}
+      points={`${width * cols + (width / 2) * (rows + 1 / 2)},${
+        height * (rows + 1 / 2)
+      }
+      ${width * (cols - 1) + (width / 2) * rows + width},${height * (rows + 1)}
+      ${(width / 2) * rows},${height * (rows + 1)}
+      ${(width / 2) * rows + width / 2},${height * rows}
+      ${width * (cols - 1) + (width / 2) * rows + width / 2},${height * rows} `}
       stroke={player1Color}
       fill={player1Color}
     />
@@ -55,9 +57,11 @@ export default function HexField({
   hexes.push(
     <polygon
       key={2}
-      points={`${0},${height} ${width},${height} ${
-        (width / 2) * rows + width / 2
-      },${height * rows} ${(width / 2) * rows - width / 2},${height * rows}`}
+      points={`${0},${height}
+      ${width / 4},${height / 2}
+      ${width},${height}
+      ${(width / 2) * rows + width / 2},${height * rows}
+      ${(width / 2) * rows},${height * (rows + 1)}`}
       stroke={player2Color}
       fill={player2Color}
     />
@@ -66,11 +70,11 @@ export default function HexField({
   hexes.push(
     <polygon
       key={3}
-      points={`${width * cols},${height} ${width * (cols + 1)},${height} ${
-        width * cols + (width / 2) * rows + width / 2
-      },${height * rows} ${
-        width * (cols - 1) + (width / 2) * rows + width / 2
-      },${height * rows}`}
+      points={`${width * cols},${height}
+       ${width * (cols - 1) + width + width / 2},0
+       ${width * cols + (width / 2) * rows + width / 2},${height * rows}
+       ${width * cols + (width / 2) * (rows + 1 / 2)},${height * (rows + 1 / 2)}
+       ${width * (cols - 1) + (width / 2) * rows + width / 2},${height * rows}`}
       stroke={player2Color}
       fill={player2Color}
     />

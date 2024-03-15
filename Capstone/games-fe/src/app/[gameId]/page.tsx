@@ -39,7 +39,7 @@ export default function Game({ params }: { params: { gameId: string } }) {
   const game = getGameFields(data.data)!;
 
   if (matches[2] === hexgameType) {
-    return <HexGame game={game} refetch={refetch} />;
+    return <HexGame gameId={params.gameId} game={game} refetch={refetch} />;
   } else {
     return <p>Unknown game</p>;
   }
