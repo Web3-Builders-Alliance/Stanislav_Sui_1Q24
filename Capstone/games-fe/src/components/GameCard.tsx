@@ -284,17 +284,22 @@ export default function GameCard({ id }: { id: string }) {
                 ? playerName1
                 : playerName2}
             </p>
-            {(game.winner_index === 1 && game.player1 === currentAccountId) ||
+            {((game.winner_index === 1 && game.player1 === currentAccountId) ||
               (game.winner_index === 2 && game.player2 === currentAccountId) ||
-              (!(game.player_withdrew_mask & 0x1) &&
-                game.player1 === currentAccountId) ||
-              (!(game.player_withdrew_mask & 0x2) &&
-                game.player2 === currentAccountId &&
-                (game.bet > 0 ? (
+              (game.is_gameover &&
+                game.winner_index === 0 &&
+                (game.player1 === currentAccountId ||
+                  game.player2 === currentAccountId))) &&
+              (game.bet > 0 ? (
+                ((!(game.player_withdrew_mask & 0x1) &&
+                  game.player1 === currentAccountId) ||
+                  (!(game.player_withdrew_mask & 0x2) &&
+                    game.player2 === currentAccountId)) && (
                   <Button onPress={withdraw}>Withdraw</Button>
-                ) : (
-                  <Button onPress={deleteGame}>Delete game</Button>
-                )))}
+                )
+              ) : (
+                <Button onPress={deleteGame}>Delete game</Button>
+              ))}
           </>
         )}
         <Link href={`/${id}`}> Open game </Link>

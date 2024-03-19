@@ -384,22 +384,22 @@ export default function TicTacToeGame({
 
   return (
     <main>
-      <h1 className="mb-4 mr-20 text-center">Tic Tac Toe 5 in a Row</h1>
-      <p className="mb-4 mr-20 text-center">
+      <h1 className="mb-4 text-center">Tic Tac Toe 5 in a Row</h1>
+      <p className="mb-4 text-center">
         {playerName1 ? playerName1 : "???"} (crosses) vs{" "}
         {playerName2 ? playerName2 : "???"} (noughts)
       </p>
       {!game.is_started ? (
-        <p className="mb-4 mr-20 text-center">Game has not started</p>
+        <p className="mb-4 text-center">Game has not started</p>
       ) : !game.is_gameover ? (
-        <p className="mb-4 mr-20 text-center">
+        <p className="mb-4  text-center">
           Current turn:{" "}
           {curPlayerNum == 1
             ? playerName1 + " (crosses)"
             : playerName2 + " (noughts)"}
         </p>
       ) : (
-        <p className="mb-4 mr-20 text-center">
+        <p className="mb-4 text-center">
           The game is over.{" "}
           {game.winner_index == 0
             ? "Draw"
