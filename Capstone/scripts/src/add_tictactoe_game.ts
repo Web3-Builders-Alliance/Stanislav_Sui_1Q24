@@ -1,5 +1,5 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { client, keypair, getSgId, getHexId } from "./utils.ts";
+import { client, keypair, getSgId, getTicTacToeId } from "./utils.ts";
 
 (async () => {
   try {
@@ -11,7 +11,7 @@ import { client, keypair, getSgId, getHexId } from "./utils.ts";
         txb.object(`${getSgId("games_pack::AdminCap")}`),
         txb.object(`${getSgId("games_pack::GamesPack")}`),
       ],
-      typeArguments: [`${getHexId("package")}::main::TicTacToe`],
+      typeArguments: [`${getTicTacToeId("package")}::main::TicTacToe`],
     });
 
     const result = await client.signAndExecuteTransactionBlock({

@@ -36,6 +36,7 @@ export default function CreateGameButton({
 }) {
   const currentAccount = useCurrentAccount();
   const hexPackageId = useNetworkVariable("hexgamePackageId");
+  const tictactoePackageId = useNetworkVariable("tictactoePackageId");
   const gamesPackId = useNetworkVariable("gamespackId");
   const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
   const client = useSuiClient();
@@ -56,6 +57,8 @@ export default function CreateGameButton({
     let packageId;
     if (gameType === "hex") {
       packageId = hexPackageId;
+    } else if (gameType === "tictactoe") {
+      packageId = tictactoePackageId;
     } else {
       return;
     }
@@ -102,6 +105,7 @@ export default function CreateGameButton({
             })
             .finally(() => {
               setIsCreating(false);
+              onClose();
             });
         },
         onError: (error) => {
@@ -137,8 +141,8 @@ export default function CreateGameButton({
               onValueChange={setGameType}
             >
               <Radio value="hex">Hex Board Game</Radio>
-              <Radio value="tic-tac-toe" isDisabled>
-                {/* Tic-Tac-Toe */}
+              <Radio value="tictactoe">Tic-Tac-Toe 5 In Row</Radio>
+              <Radio value="" isDisabled>
                 Another game
               </Radio>
             </RadioGroup>

@@ -1,5 +1,6 @@
 "use client";
 import HexGame from "@/components/HexGame/HexGame";
+import TicTacToeGame from "@/components/TicTacToeGame/TicTacToeGame";
 import { useNetworkVariable } from "@/utils/networkConfig";
 import { getGameFields } from "@/utils/objects";
 import { useSuiClientQuery } from "@mysten/dapp-kit";
@@ -7,6 +8,7 @@ import { useSuiClientQuery } from "@mysten/dapp-kit";
 export default function Game({ params }: { params: { gameId: string } }) {
   const suigamesPackageId = useNetworkVariable("suigamesPackageId");
   const hexgameType = useNetworkVariable("hexgameType");
+  const tictactoeType = useNetworkVariable("tictactoeType");
 
   const { data, isPending, error, refetch } = useSuiClientQuery("getObject", {
     id: params.gameId,
@@ -40,6 +42,10 @@ export default function Game({ params }: { params: { gameId: string } }) {
 
   if (matches[2] === hexgameType) {
     return <HexGame gameId={params.gameId} game={game} refetch={refetch} />;
+  } else if (matches[2] === tictactoeType) {
+    return (
+      <TicTacToeGame gameId={params.gameId} game={game} refetch={refetch} />
+    );
   } else {
     return <p>Unknown game</p>;
   }

@@ -7,9 +7,11 @@ import GameCard from "./GameCard";
 
 export default function GamesList() {
   const gamesPackId = useNetworkVariable("gamespackId");
-  const hamegameType = useNetworkVariable("hexgameType");
+  const hexgameType = useNetworkVariable("hexgameType");
+  const tictactoeType = useNetworkVariable("tictactoeType");
 
-  const [gameIds, setGameIds] = useState<string[]>([]);
+  const [hexGameIds, setHexGameIds] = useState<string[]>([]);
+  const [tictactoeIds, setTictactoeIds] = useState<string[]>([]);
 
   const client = useSuiClient();
 
@@ -27,26 +29,38 @@ export default function GamesList() {
       }
 
       let fields = await client.getDynamicFields({
-        parentId: getGamesFromGamepack(data.data, hamegameType),
+        parentId: getGamesFromGamepack(data.data, hexgameType),
       });
 
-      setGameIds(fields.data.map((game: any) => game.name.value));
+      setHexGameIds(fields.data.map((game: any) => game.name.value));
+
+      fields = await client.getDynamicFields({
+        parentId: getGamesFromGamepack(data.data, tictactoeType),
+      });
+
+      setTictactoeIds(fields.data.map((game: any) => game.name.value));
     })();
-  }, [data, hamegameType, client]);
+  }, [data, hexgameType, tictactoeType, client]);
 
   if (isPending) return <div>Loading...</div>;
   if (error) return <div>Error</div>;
 
   if (!data.data) return;
 
-  // console.log(games);
-
   return (
-    <div className="grid md:grid-cols-3 gap-4">
-      {gameIds.map((gameId) => (
-        <GameCard key={gameId} id={gameId} />
-      ))}
-    </div>
+    <>
+      {hexGameIds.length > 0 && <h1>Hex Board Games List</h1>}
+      <div className="grid md:grid-cols-3 gap-4">
+        {hexGameIds.map((gameId) => (
+          <GameCard key={gameId} id={gameId} />
+        ))}
+      </div>
+      {tictactoeIds.length > 0 && <h1>Tic Tac Toe 5 in Row Games List</h1>}
+      <div className="grid md:grid-cols-3 gap-4">
+        {tictactoeIds.map((gameId) => (
+          <GameCard key={gameId} id={gameId} />
+        ))}
+      </div>
+    </>
   );
-  // return <>{gameIds.map((gameId) => gameId)}</>;
 }

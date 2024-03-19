@@ -17,6 +17,7 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
         hexgamePackageId: DEVNET_HEXGAME_PACKAGE_ID,
         hexgameType: DEVNET_HEXGAME_PACKAGE_ID + "::main::HexGame",
         hexgameBoardType: DEVNET_HEXGAME_PACKAGE_ID + "::board::Board",
+        tictactoePackageId: DEVNET_TICTACTOE_PACKAGE_ID,
         tictactoeType: DEVNET_TICTACTOE_PACKAGE_ID + "::main::TicTacToe",
         tictactoeBoardType: DEVNET_TICTACTOE_PACKAGE_ID + "::board::Board",
       },

@@ -1,7 +1,7 @@
 [package]
 name = "SuiGames"
 version = "0.0.1"
-published-at = "0xed57d7f03c500b22746be8b12b58240a9f7b4596e519cf689ffc71b35db6541c"
+published-at = "0xd6ea4bd41d4af50ddadd028f13291ba052f98de2f2184f4721029379cf74f851"
 
 
 # edition = "2024.alpha" # To use the Move 2024 edition, currently in alpha
@@ -23,7 +23,7 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 # Override = { local = "../conflicting/version", override = true }
 
 [addresses]
-sui_games = "0xed57d7f03c500b22746be8b12b58240a9f7b4596e519cf689ffc71b35db6541c"
+sui_games = "0xd6ea4bd41d4af50ddadd028f13291ba052f98de2f2184f4721029379cf74f851"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.

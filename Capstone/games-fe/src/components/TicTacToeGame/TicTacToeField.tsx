@@ -33,12 +33,12 @@ export default function TicTacToeField({
   };
 
   return (
-    <>
+    <div>
       {field.map((row, i) => (
         <div key={i} className="field-row">
           {row.map((_, j) => renderSquare(i, j))}
         </div>
       ))}
-    </>
+    </div>
   );
 }
