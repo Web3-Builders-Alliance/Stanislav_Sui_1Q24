@@ -30,7 +30,7 @@ module sui_games::game {
     const ENotFirstTurn: u64 = 11;
     const EWrongGame: u64 = 12;
     const ENotWinner: u64 = 13;
-    const EAlreadyWithdrew: u64 = 14;
+    const EAlreadyWithdrawn: u64 = 14;
     const EAlreadySuggestedDraw: u64 = 15;
 
     // === Constants ===
@@ -346,8 +346,8 @@ module sui_games::game {
 
         let player_num = if (player == self.player1) 1 else 2;
 
-        assert!(self.suggested_draw_mask & (1 << player_num) == 0, EAlreadySuggestedDraw);
-        self.suggested_draw_mask = self.suggested_draw_mask | (1 << player_num);
+        assert!(self.suggested_draw_mask & (1 << (player_num - 1)) == 0, EAlreadySuggestedDraw);
+        self.suggested_draw_mask = self.suggested_draw_mask | (1 << (player_num - 1));
         if (self.suggested_draw_mask == 3) {
             self.is_gameover = true;
             games_pack::player_draw<GAME_TYPE>(games_pack, self.player1);
@@ -369,12 +369,12 @@ module sui_games::game {
         if (self.winner_index == 0) {
             let player_num = if (player == self.player1) 1 else 2;
             if (player_num == 1) {
-                assert!(self.player_withdrew_mask & 1 == 0, EAlreadyWithdrew);
+                assert!(self.player_withdrew_mask & 1 == 0, EAlreadyWithdrawn);
                 self.player_withdrew_mask = self.player_withdrew_mask | 1;
             };
 
             if (player_num == 2) {
-                assert!(self.player_withdrew_mask & 2 == 0, EAlreadyWithdrew);
+                assert!(self.player_withdrew_mask & 2 == 0, EAlreadyWithdrawn);
                 self.player_withdrew_mask = self.player_withdrew_mask | 2;
             };
 

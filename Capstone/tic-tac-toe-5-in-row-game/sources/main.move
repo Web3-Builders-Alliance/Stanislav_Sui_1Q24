@@ -54,6 +54,9 @@ module tic_tac_toe_5_in_row::main {
     }
 
     public fun make_move(game: &mut Game<TicTacToe, Board>, games_pack: &mut GamesPack, player: &Account, tile: u8) {
+
+        let turn_number = game::turn_number(game);
+
         let (board, player_num) = game::make_move(game, player, TicTacToe {});
 
         assert!(board::is_tile_free(board, tile), ETileAlreadyTaken);
@@ -61,7 +64,7 @@ module tic_tac_toe_5_in_row::main {
         board::set_tile(board, tile, player_num);
 
         let full_size = BOARD_SIZE * BOARD_SIZE;
-        if (game::turn_number(game) * 2 == (full_size as u32) && game::player_num(game) == 2) {
+        if (turn_number * 2 + (player_num as u32) == (full_size as u32)) {
             game::draw_from_game(game, games_pack, player, TicTacToe {});
         }
     }

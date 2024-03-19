@@ -86,6 +86,8 @@ export default function TicTacToeGame({
   // const curPlayerNum = 2;
   const curPlayerNum = game.is_first_player_turn ? 1 : 2;
 
+  const curAccountPlayerNum = currentAccountId === game.player1 ? 1 : 2;
+
   const constructMatrixField = (field: number[], size: number) => {
     let matrix = [];
 
@@ -398,8 +400,10 @@ export default function TicTacToeGame({
         </p>
       ) : (
         <p className="mb-4 mr-20 text-center">
-          The game is over. {game.winner_index == 1 ? playerName1 : playerName2}{" "}
-          won
+          The game is over.{" "}
+          {game.winner_index == 0
+            ? "Draw"
+            : (game.winner_index == 1 ? playerName1 : playerName2) + " won"}
         </p>
       )}
       <div className="flex justify-center">
@@ -433,8 +437,8 @@ export default function TicTacToeGame({
         <Button
           color="warning"
           isDisabled={
-            (game.suggested_draw_mask & 1 && curPlayerNum == 1) ||
-            (game.suggested_draw_mask & 2 && curPlayerNum == 2) ||
+            (game.suggested_draw_mask & 1 && curAccountPlayerNum == 1) ||
+            (game.suggested_draw_mask & 2 && curAccountPlayerNum == 2) ||
             !game.is_started ||
             !isPlayer ||
             game.is_gameover
