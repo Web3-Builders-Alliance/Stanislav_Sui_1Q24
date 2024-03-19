@@ -18,7 +18,11 @@ export type Game = {
   };
   is_first_player_turn: boolean;
   is_started: boolean;
-  is_swapable: boolean;
+  is_gameover: boolean;
+  can_swap: boolean;
+  can_draw: boolean;
+  suggested_draw_mask: number;
+  player_withdrew_mask: number;
   player1: string;
   player2: string;
   turn_number: number;

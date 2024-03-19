@@ -76,7 +76,7 @@ module hex_game::board_tests {
         assert_eq(board::is_path_correct(&board, &path, 1), false);
     }
 
-        #[test]
+    #[test]
     fun test_is_path_correct3() {
         // 0,  1,  2,  3,  4,  5,  6
         //  7,  8,  9, 10, 11, 12, 13

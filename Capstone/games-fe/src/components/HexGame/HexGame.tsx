@@ -79,7 +79,6 @@ export default function HexGame({
     (game.is_first_player_turn
       ? currentAccountId === game.player1
       : currentAccountId === game.player2);
-  const isGameOver = game.winner_index !== 0;
 
   const isPlayer =
     game.player1 === currentAccountId || game.player2 === currentAccountId;
@@ -206,18 +205,18 @@ export default function HexGame({
   const handleClick = (row: number, col: number) => {
     // console.log(row, col);
 
-    if (!isYourTurn || isGameOver) {
+    if (!isYourTurn || game.is_gameover) {
       return;
     }
 
     if (field[row][col] === 0) {
       setCurMove({ row, col });
     }
-    let grid = field.map((row) => [...row]);
-    grid[row][col] = curPlayerNum;
-    let path = findPath(grid, board.size, curPlayerNum);
+    let field_copy = field.map((row) => [...row]);
+    field_copy[row][col] = curPlayerNum;
+    let path = findPath(field_copy, board.size, curPlayerNum);
 
-    setPath(findPath(grid, board.size, curPlayerNum));
+    setPath(path);
   };
 
   const move = async (win: boolean) => {
@@ -320,7 +319,11 @@ export default function HexGame({
     const txb = new TransactionBlock();
 
     txb.moveCall({
-      arguments: [txb.object(gameId), txb.object(currentAccountId)],
+      arguments: [
+        txb.object(gameId),
+        txb.object(gamespackId),
+        txb.object(currentAccountId),
+      ],
       target: `${hexgamePackageId}::main::give_up`,
     });
 
@@ -364,7 +367,7 @@ export default function HexGame({
       </p>
       {!game.is_started ? (
         <p className="mb-4 mr-20 text-center">Game has not started</p>
-      ) : !isGameOver ? (
+      ) : !game.is_gameover ? (
         <p
           className="mb-4 mr-20 text-center"
           style={{ color: curPlayerNum == 1 ? player1Color : player2Color }}
@@ -398,7 +401,7 @@ export default function HexGame({
         {path ? (
           <Button
             color="primary"
-            isDisabled={!isYourTurn || isGameOver}
+            isDisabled={!isYourTurn || game.is_gameover}
             onPress={() => move(true)}
           >
             Win
@@ -406,7 +409,7 @@ export default function HexGame({
         ) : (
           <Button
             color="primary"
-            isDisabled={!isYourTurn || isGameOver || curMove.row == undefined}
+            isDisabled={!isYourTurn || game.is_gameover || curMove.row == undefined}
             onPress={() => move(false)}
           >
             Move
@@ -419,7 +422,7 @@ export default function HexGame({
         )}
         <Button
           color="danger"
-          isDisabled={!game.is_started || !isPlayer || isGameOver}
+          isDisabled={!game.is_started || !isPlayer || game.is_gameover}
           className="ml-2"
           onPress={giveUp}
         >

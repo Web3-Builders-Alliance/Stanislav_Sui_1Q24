@@ -1,0 +1,18 @@
+.field-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+.square {
+  border: 1px solid #999;
+  background-color: #eeeeee;
+  float: left;
+  font-size: 15px;
+  height: 25px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 25px;
+  cursor: default;
+}

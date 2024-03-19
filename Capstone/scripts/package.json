@@ -9,7 +9,9 @@
   "scripts": {
     "publish_sg": "ts-node ./src/publish_sg.ts",
     "publish_hex": "ts-node ./src/publish_hex.ts",
-    "add_hex_game": "ts-node ./src/add_hex_game.ts"
+    "publish_tictactoe": "ts-node ./src/publish_tictactoe.ts",
+    "add_hex_game": "ts-node ./src/add_hex_game.ts",
+    "add_tictactoe_game": "ts-node ./src/add_tictactoe_game.ts"
   },
   "dependencies": {
     "@mysten/sui.js": "^0.49.1",

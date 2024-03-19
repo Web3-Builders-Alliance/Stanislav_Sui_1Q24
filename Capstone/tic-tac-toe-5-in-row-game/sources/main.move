@@ -1,4 +1,4 @@
-module hex_game::main {
+module tic_tac_toe_5_in_row::main {
     // === Imports ===
 
     use sui::tx_context::{TxContext};
@@ -10,7 +10,7 @@ module hex_game::main {
     use sui_games::games_pack::GamesPack;
     use sui_games::account::Account;
 
-    use hex_game::board::{Self, Board};
+    use tic_tac_toe_5_in_row::board::{Self, Board};
 
     // === Friends ===
 
@@ -22,11 +22,11 @@ module hex_game::main {
     // === Constants ===
 
     // should be < 16
-    const BOARD_SIZE: u8 = 11;
+    const BOARD_SIZE: u8 = 15;
 
     // === Structs ===
 
-    struct HexGame has drop {}
+    struct TicTacToe has drop {}
 
     // === Public-Mutative Functions ===
 
@@ -41,9 +41,9 @@ module hex_game::main {
         let board = board::create_board(BOARD_SIZE);
         game::create_game(
             games,
-            HexGame {},
-            true,
+            TicTacToe {},
             false,
+            true,
             board,
             player,
             opponent,
@@ -53,27 +53,28 @@ module hex_game::main {
         );
     }
 
-    public fun make_move(game: &mut Game<HexGame, Board>, player: &Account, tile: u8) {
-        let (board, player_num) = game::make_move(game, player, HexGame {});
+    public fun make_move(game: &mut Game<TicTacToe, Board>, games_pack: &mut GamesPack, player: &Account, tile: u8) {
+        let (board, player_num) = game::make_move(game, player, TicTacToe {});
 
         assert!(board::is_tile_free(board, tile), ETileAlreadyTaken);
 
         board::set_tile(board, tile, player_num);
+
+        let full_size = BOARD_SIZE * BOARD_SIZE;
+        if (game::turn_number(game) * 2 == (full_size as u32) && game::player_num(game) == 2) {
+            game::draw_from_game(game, games_pack, player, TicTacToe {});
+        }
     }
 
-    public fun swap_sides(game: &mut Game<HexGame, Board>, player: &Account) {
-        game::swap_sides(game, player, HexGame {});
+    public fun give_up(game: &mut Game<TicTacToe, Board>, games_pack: &mut GamesPack, player: &Account) {
+        game::give_up(game, games_pack, player, TicTacToe {});
     }
 
-    public fun give_up(game: &mut Game<HexGame, Board>, games_pack: &mut GamesPack, player: &Account) {
-        game::give_up(game, games_pack, player, HexGame {});
-    }
+    public fun declare_win(game: &mut Game<TicTacToe, Board>, games_pack: &mut GamesPack, player: &Account, path: vector<u8>, direction: u8) {
+        let (board, player_num, winner_request) = sui_games::game::get_state_to_win(game, player, TicTacToe {});
 
-    public fun declare_win(game: &mut Game<HexGame, Board>, games_pack: &mut GamesPack, player: &Account, path: vector<u8>) {
-        let (board, player_num, winner_request) = sui_games::game::get_state_to_win(game, player, HexGame {});
-
-        assert!(board::is_path_correct(board, &path, player_num), EWrongPath);
-        game::declare_win(game, games_pack, winner_request, HexGame {});
+        assert!(board::is_path_correct(board, &path, direction, player_num), EWrongPath);
+        game::declare_win(game, games_pack, winner_request, TicTacToe {});
     }
 
 

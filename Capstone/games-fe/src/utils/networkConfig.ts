@@ -3,6 +3,7 @@ import {
   DEVNET_SUIGAMES_PACKAGE_ID,
   DEVNET_GAMESPACK_ID,
   DEVNET_HEXGAME_PACKAGE_ID,
+  DEVNET_TICTACTOE_PACKAGE_ID,
 } from "./constants";
 import { createNetworkConfig } from "@mysten/dapp-kit";
 
@@ -16,6 +17,8 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
         hexgamePackageId: DEVNET_HEXGAME_PACKAGE_ID,
         hexgameType: DEVNET_HEXGAME_PACKAGE_ID + "::main::HexGame",
         hexgameBoardType: DEVNET_HEXGAME_PACKAGE_ID + "::board::Board",
+        tictactoeType: DEVNET_TICTACTOE_PACKAGE_ID + "::main::TicTacToe",
+        tictactoeBoardType: DEVNET_TICTACTOE_PACKAGE_ID + "::board::Board",
       },
     },
   });

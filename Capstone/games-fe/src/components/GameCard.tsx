@@ -267,7 +267,7 @@ export default function GameCard({ id }: { id: string }) {
         </p>
         <p>Bet: {game?.bet! / Number(MIST_PER_SUI)} Sui</p>
         <p>Started: {game?.is_started ? "yes" : "no"}</p>
-        <p>Ended: {game?.winner_index !== 0 ? "yes" : "no"}</p>
+        <p>Ended: {game?.is_gameover ? "yes" : "no"}</p>
         {currentAccountId &&
           !game?.is_started &&
           (game?.player1 === currentAccountId ? (
@@ -278,20 +278,27 @@ export default function GameCard({ id }: { id: string }) {
               <Button onPress={joinGame}>Join game</Button>
             )
           ))}
-        {game?.winner_index !== 0 && (
+        {game?.is_gameover && (
           <>
             <p>
-              Winner: {game?.winner_index === 1 ? playerName1 : playerName2}
+              Winner:{" "}
+              {game.winner_index === 0
+                ? "draw"
+                : game?.winner_index === 1
+                ? playerName1
+                : playerName2}
             </p>
-            {((game?.winner_index === 1 &&
-              game?.player1 === currentAccountId) ||
-              (game?.winner_index === 2 &&
-                game?.player2 === currentAccountId)) &&
-              (game?.bet > 0 ? (
-                <Button onPress={withdraw}>Withdraw</Button>
-              ) : (
-                <Button onPress={deleteGame}>Delete game</Button>
-              ))}
+            {(game.winner_index === 1 && game.player1 === currentAccountId) ||
+              (game.winner_index === 2 && game.player2 === currentAccountId) ||
+              (!(game.player_withdrew_mask & 0x1) &&
+                game.player1 === currentAccountId) ||
+              (!(game.player_withdrew_mask & 0x2) &&
+                game.player2 === currentAccountId &&
+                (game.bet > 0 ? (
+                  <Button onPress={withdraw}>Withdraw</Button>
+                ) : (
+                  <Button onPress={deleteGame}>Delete game</Button>
+                )))}
           </>
         )}
         <Link href={`/${id}`}> Open game </Link>

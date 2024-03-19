@@ -34,7 +34,8 @@ module sui_games::games_pack {
 
     struct PlayerScores has store, drop {
         wins: u64,
-        losses: u64
+        losses: u64,
+        draws: u64
     }
 
     struct GamesPack has key {
@@ -123,7 +124,7 @@ module sui_games::games_pack {
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
-            table::add(player_stats, player, PlayerScores {wins: 1, losses: 0});
+            table::add(player_stats, player, PlayerScores {wins: 1, losses: 0, draws: 0});
         } else {
             let player_stats = table::borrow_mut(player_stats, player);
             player_stats.wins = player_stats.wins + 1;
@@ -135,10 +136,22 @@ module sui_games::games_pack {
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
-            table::add(player_stats, player, PlayerScores {wins: 0, losses: 1});
+            table::add(player_stats, player, PlayerScores {wins: 0, losses: 1, draws: 0});
         } else {
             let player_stats = table::borrow_mut(player_stats, player);
             player_stats.losses = player_stats.losses + 1;
+        }
+    }
+
+    public(friend) fun player_draw<GAME_TYPE>(self: &mut GamesPack, player: address) {
+        let game_type = type_name::get<GAME_TYPE>();
+        if (!vec_map::contains(&self.game_types, &game_type)) return;
+        let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
+        if (!table::contains(player_stats, player)) {
+            table::add(player_stats, player, PlayerScores {wins: 0, losses: 0, draws: 1});
+        } else {
+            let player_stats = table::borrow_mut(player_stats, player);
+            player_stats.draws = player_stats.draws + 1;
         }
     }
 

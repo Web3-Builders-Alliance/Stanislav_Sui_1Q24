@@ -37,3 +37,15 @@ export const getHexId = (type: string): string | undefined => {
     console.error("Error reading the created file:", error);
   }
 };
+
+export const getTicTacToeId = (type: string): string | undefined => {
+  try {
+    const rawData = fs.readFileSync("./created_tic_tac_toe.json", "utf8");
+    const parsedData: IObjectInfo[] = JSON.parse(rawData);
+    const typeToId = new Map(parsedData.map((item) => [item.type, item.id]));
+    return typeToId.get(type);
+  } catch (error) {
+    console.error("Error reading the created file:", error);
+  }
+};
+
