@@ -22,7 +22,6 @@ export default function GameCard({ id }: { id: string }) {
   const { mutate: signAndExecute } = useSignAndExecuteTransactionBlock();
   const suigamesPackageId = useNetworkVariable("suigamesPackageId");
   const gamesPackId = useNetworkVariable("gamespackId");
-  const hexgameType = useNetworkVariable("hexgameType");
 
   const { accountId: currentAccountId } = useContext(AccountContext);
 
@@ -258,9 +257,6 @@ export default function GameCard({ id }: { id: string }) {
   return (
     <Card>
       <CardBody>
-        {gameType === hexgameType && (
-          <h1 className="text-center">Hex Board Game</h1>
-        )}
         <p>
           {playerName1 ? playerName1 : "???"} vs{" "}
           {playerName2 ? playerName2 : "???"}

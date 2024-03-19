@@ -4,6 +4,7 @@ import { useSuiClient, useSuiClientQuery } from "@mysten/dapp-kit";
 
 import { useEffect, useState } from "react";
 import GameCard from "./GameCard";
+import CreateGameButton from "./CreateGameButton";
 
 export default function GamesList() {
   const gamesPackId = useNetworkVariable("gamespackId");
@@ -49,13 +50,14 @@ export default function GamesList() {
 
   return (
     <>
-      {hexGameIds.length > 0 && <h1>Hex Board Games List</h1>}
+      <CreateGameButton classname="mb-2" onCreate={refetch} />
+      {hexGameIds.length > 0 && <h1 className="mb-2">Hex Board Games List</h1>}
       <div className="grid md:grid-cols-3 gap-4">
         {hexGameIds.map((gameId) => (
           <GameCard key={gameId} id={gameId} />
         ))}
       </div>
-      {tictactoeIds.length > 0 && <h1>Tic Tac Toe 5 in Row Games List</h1>}
+      {tictactoeIds.length > 0 && <h1 className="my-2">Tic Tac Toe 5 in a Row Games List</h1>}
       <div className="grid md:grid-cols-3 gap-4">
         {tictactoeIds.map((gameId) => (
           <GameCard key={gameId} id={gameId} />

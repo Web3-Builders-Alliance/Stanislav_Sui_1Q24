@@ -382,7 +382,7 @@ export default function TicTacToeGame({
 
   return (
     <main>
-      <h1 className="mb-4 mr-20 text-center">Hex Board Game</h1>
+      <h1 className="mb-4 mr-20 text-center">Tic Tac Toe 5 in a Row</h1>
       <p className="mb-4 mr-20 text-center">
         {playerName1 ? playerName1 : "???"} (crosses) vs{" "}
         {playerName2 ? playerName2 : "???"} (noughts)

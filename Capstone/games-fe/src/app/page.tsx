@@ -1,6 +1,5 @@
 "use client";
 
-import CreateGameButton from "@/components/CreateGameButton";
 import GamesList from "@/components/GamesList";
 import { useCurrentAccount } from "@mysten/dapp-kit";
 import { SUI_DEVNET_CHAIN } from "@mysten/wallet-standard";
@@ -23,7 +22,6 @@ export default function Home() {
       {currentAccount && currentAccount.chains[0] === SUI_DEVNET_CHAIN && (
         <>
           <p>Welcome to Sui Games</p>
-          <CreateGameButton classname="mb-2" />
           <GamesList />
         </>
       )}
