@@ -4,7 +4,7 @@ import {
   useSignAndExecuteTransactionBlock,
   useSuiClient,
 } from "@mysten/dapp-kit";
-import { SUI_DEVNET_CHAIN } from "@mysten/wallet-standard";
+import { SUI_TESTNET_CHAIN } from "@mysten/wallet-standard";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import {
   MIST_PER_SUI,
@@ -117,7 +117,7 @@ export default function CreateGameButton({
     );
   };
 
-  if (!currentAccount || currentAccount.chains[0] !== SUI_DEVNET_CHAIN) return;
+  if (!currentAccount || currentAccount.chains[0] !== SUI_TESTNET_CHAIN) return;
 
   if (!accountId)
     return (

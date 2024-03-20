@@ -4,7 +4,7 @@ import {
   useSignAndExecuteTransactionBlock,
   useSuiClient,
 } from "@mysten/dapp-kit";
-import { SUI_DEVNET_CHAIN } from "@mysten/wallet-standard";
+import { SUI_TESTNET_CHAIN } from "@mysten/wallet-standard";
 import { bcs } from "@mysten/sui.js/bcs";
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { SUI_CLOCK_OBJECT_ID } from "@mysten/sui.js/utils";
@@ -86,7 +86,7 @@ export default function CreateAccountButton() {
     );
   };
 
-  if (!currentAccount || currentAccount.chains[0] !== SUI_DEVNET_CHAIN) return;
+  if (!currentAccount || currentAccount.chains[0] !== SUI_TESTNET_CHAIN) return;
 
   if (!accountId) {
     return (

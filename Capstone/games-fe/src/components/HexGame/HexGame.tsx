@@ -415,7 +415,7 @@ export default function HexGame({
             Move
           </Button>
         )}
-        {isYourTurn && !game.is_first_player_turn && game.turn_number == 1 && (
+        {isYourTurn && !game.is_first_player_turn && game.turn_number == 0 && (
           <Button color="warning" className="ml-2" onPress={swapSides}>
             Swap Sides
           </Button>

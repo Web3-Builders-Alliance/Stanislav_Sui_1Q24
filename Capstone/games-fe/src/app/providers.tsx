@@ -15,7 +15,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <NextUIProvider>
       <QueryClientProvider client={queryClient}>
-        <SuiClientProvider networks={networkConfig} defaultNetwork="devnet">
+        <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
           <WalletProvider autoConnect>
             <AccountProvider>{children}</AccountProvider>
           </WalletProvider>
