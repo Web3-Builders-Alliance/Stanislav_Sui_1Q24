@@ -37,7 +37,7 @@ module sui_games::game {
 
     // === Structs ===
 
-    struct Game<phantom GAME_TYPE, STATE> has key {
+    struct Game<phantom GameType, State> has key {
         id: UID,
         player1: address,
         player2: address,
@@ -55,7 +55,7 @@ module sui_games::game {
         player_withdrew_mask: u8,
         bet: Balance<SUI>,
         created_at: u64,
-        game_state: STATE
+        game_state: State
     }
 
     struct WinnerRequest {
@@ -64,57 +64,57 @@ module sui_games::game {
     }
 
     // === Events ===
-    struct GameCreated<phantom GAME_TYPE> has copy, drop {
+    struct GameCreated<phantom GameType> has copy, drop {
         game_id: ID
     }
 
-    struct GameCancelled<phantom GAME_TYPE> has copy, drop {
+    struct GameCancelled<phantom GameType> has copy, drop {
         game_id: ID
     }
-    struct GameStarted<phantom GAME_TYPE> has copy, drop {
+    struct GameStarted<phantom GameType> has copy, drop {
         game_id: ID
     }
-    struct GameEnded<phantom GAME_TYPE> has copy, drop {
+    struct GameEnded<phantom GameType> has copy, drop {
         game_id: ID,
         winner_index: u8
     }
 
-    struct GameDeleted<phantom GAME_TYPE> has copy, drop {
+    struct GameDeleted<phantom GameType> has copy, drop {
         game_id: ID
     }
 
-    struct GameMove<phantom GAME_TYPE> has copy, drop {
+    struct GameMove<phantom GameType> has copy, drop {
         game_id: ID,
         player_num: u8,
     }
 
-    struct GameSwapSides<phantom GAME_TYPE> has copy, drop {
+    struct GameSwapSides<phantom GameType> has copy, drop {
         game_id: ID,
     }
 
-    struct GameDrawn<phantom GAME_TYPE> has copy, drop {
+    struct GameDrawn<phantom GameType> has copy, drop {
         game_id: ID
     }
 
     // === Public-Mutative Functions ===
 
-    public fun create_game<GAME_TYPE: drop, STATE: store>(
+    public fun create_game<GameType: drop, State: store>(
         games_pack: &mut GamesPack,
-        _: GAME_TYPE,
+        _: GameType,
         can_swap: bool,
         can_draw: bool,
-        game_state: STATE,
+        game_state: State,
         player1: &Account,
         opponent: address,
         bet: Coin<SUI>,
         clock: &Clock,
         ctx: &mut TxContext
     ) {
-        assert!(games_pack::has_game<GAME_TYPE>(games_pack), EGameTypeDoesNotExist);
+        assert!(games_pack::has_game<GameType>(games_pack), EGameTypeDoesNotExist);
         let player1 = object::id_address(player1);
         let player2 = opponent;
         assert!(player1 != player2, ESamePlayer);
-        let game = Game<GAME_TYPE, STATE> {
+        let game = Game<GameType, State> {
             id: object::new(ctx),
             player1: player1,
             player2: player2,
@@ -131,27 +131,27 @@ module sui_games::game {
             created_at: clock::timestamp_ms(clock),
             game_state,
         };
-        games_pack::add_game<GAME_TYPE>(games_pack, object::uid_to_inner(&game.id));
-        event::emit(GameCreated<GAME_TYPE> {
+        games_pack::add_game<GameType>(games_pack, object::uid_to_inner(&game.id));
+        event::emit(GameCreated<GameType> {
             game_id: object::uid_to_inner(&game.id)
         });
         // maybe return here, not share ??? -> need to add `store`
         transfer::share_object(game);
     }
 
-    public fun cancel_game<GAME_TYPE, STATE>(
-        self: Game<GAME_TYPE, STATE>,
+    public fun cancel_game<GameType, State>(
+        self: Game<GameType, State>,
         games_pack: &mut GamesPack,
         player: &Account,
         ctx: &mut TxContext
-    ): (Coin<SUI>, STATE) {
+    ): (Coin<SUI>, State) {
         assert!(!self.is_started, EAlreadyStarted);
         let player = object::id_address(player);
         assert!(self.player1 == player, EWrongPlayer);
 
-        games_pack::remove_game<GAME_TYPE>(games_pack, object::uid_to_inner(&self.id));
+        games_pack::remove_game<GameType>(games_pack, object::uid_to_inner(&self.id));
 
-        event::emit(GameCancelled<GAME_TYPE> {
+        event::emit(GameCancelled<GameType> {
             game_id: object::uid_to_inner(&self.id)
         });
 
@@ -177,8 +177,8 @@ module sui_games::game {
         (coin::from_balance(bet, ctx), game_state)
     }
 
-    public fun join_game<GAME_TYPE, STATE: store>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun join_game<GameType, State: store>(
+        self: &mut Game<GameType, State>,
         player: &Account,
         bet: Coin<SUI>
     ) {
@@ -193,14 +193,14 @@ module sui_games::game {
         };
         balance::join(&mut self.bet, coin::into_balance(bet));
         self.is_started = true;
-        event::emit(GameStarted<GAME_TYPE> { game_id: object::uid_to_inner(&self.id) });
+        event::emit(GameStarted<GameType> { game_id: object::uid_to_inner(&self.id) });
     }
 
-    public fun make_move<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun make_move<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         player: &Account,
-        _: GAME_TYPE
-    ): (&mut STATE, u8) {
+        _: GameType
+    ): (&mut State, u8) {
         assert!(self.is_started, ENotStarted);
         assert!(!self.is_gameover, EGameAlreadyOver);
         let player = object::id_address(player);
@@ -213,7 +213,7 @@ module sui_games::game {
 
         let cur_player_num = if (self.is_first_player_turn) 1 else 2;
 
-        event::emit(GameMove<GAME_TYPE> {
+        event::emit(GameMove<GameType> {
             game_id: object::uid_to_inner(&self.id),
             player_num: cur_player_num
         });
@@ -221,11 +221,11 @@ module sui_games::game {
         (&mut self.game_state, cur_player_num)
     }
 
-    public fun swap_sides<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun swap_sides<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         player: &Account,
-        _: GAME_TYPE
-    ): &mut STATE {
+        _: GameType
+    ): &mut State {
         assert!(self.is_started, ENotStarted); // not neccessary?
         assert!(!self.is_gameover, EGameAlreadyOver);
         assert!(self.can_swap, ECanNotSwap);
@@ -236,17 +236,17 @@ module sui_games::game {
         self.player2 = self.player1;
         self.player1 = player;
 
-        event::emit(GameSwapSides<GAME_TYPE> { game_id: object::uid_to_inner(&self.id) });
+        event::emit(GameSwapSides<GameType> { game_id: object::uid_to_inner(&self.id) });
 
         &mut self.game_state
     }
 
-    public fun give_up<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun give_up<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         games_pack: &mut GamesPack,
         player: &Account,
-        _: GAME_TYPE
-    ): &mut STATE {
+        _: GameType
+    ): &mut State {
         assert!(self.is_started, ENotStarted);
         assert!(!self.is_gameover, EGameAlreadyOver);
         let player = object::id_address(player);
@@ -255,25 +255,25 @@ module sui_games::game {
         self.is_gameover = true;
 
         if (self.winner_index == 1) {
-            games_pack::player_win<GAME_TYPE>(games_pack, self.player1);
-            games_pack::player_lose<GAME_TYPE>(games_pack, self.player2);
+            games_pack::player_win<GameType>(games_pack, self.player1);
+            games_pack::player_lose<GameType>(games_pack, self.player2);
         } else {
-            games_pack::player_win<GAME_TYPE>(games_pack, self.player2);
-            games_pack::player_lose<GAME_TYPE>(games_pack, self.player1);
+            games_pack::player_win<GameType>(games_pack, self.player2);
+            games_pack::player_lose<GameType>(games_pack, self.player1);
         };
 
-        event::emit(GameEnded<GAME_TYPE> {
+        event::emit(GameEnded<GameType> {
             game_id: object::uid_to_inner(&self.id),
             winner_index: self.winner_index
         });
         &mut self.game_state
     }
 
-    public fun get_state_to_win<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun get_state_to_win<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         player: &Account,
-        _: GAME_TYPE
-    ): (&STATE, u8, WinnerRequest) {
+        _: GameType
+    ): (&State, u8, WinnerRequest) {
         assert!(self.is_started, ENotStarted);
         assert!(!self.is_gameover, EGameAlreadyOver);
         let player = object::id_address(player);
@@ -286,12 +286,12 @@ module sui_games::game {
         (&self.game_state, player_num, winner_request)
     }
 
-    // is "_: GAME_TYPE" needed?
-    public fun declare_win<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    // is "_: GameType" needed?
+    public fun declare_win<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         games_pack: &mut GamesPack,
         win_req: WinnerRequest,
-        _: GAME_TYPE
+        _: GameType
     ) {
         let WinnerRequest {game_id, winner_index} = win_req;
         assert!(game_id == object::uid_to_inner(&self.id), EWrongGame);
@@ -299,24 +299,24 @@ module sui_games::game {
         self.is_gameover = true;
 
         if (winner_index == 1) {
-            games_pack::player_win<GAME_TYPE>(games_pack, self.player1);
-            games_pack::player_lose<GAME_TYPE>(games_pack, self.player2);
+            games_pack::player_win<GameType>(games_pack, self.player1);
+            games_pack::player_lose<GameType>(games_pack, self.player2);
         } else {
-            games_pack::player_win<GAME_TYPE>(games_pack, self.player2);
-            games_pack::player_lose<GAME_TYPE>(games_pack, self.player1);
+            games_pack::player_win<GameType>(games_pack, self.player2);
+            games_pack::player_lose<GameType>(games_pack, self.player1);
         };
 
-        event::emit(GameEnded<GAME_TYPE> {
+        event::emit(GameEnded<GameType> {
             game_id: object::uid_to_inner(&self.id),
             winner_index: self.winner_index
         });
     }
 
-    public fun draw_from_game<GAME_TYPE: drop, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun draw_from_game<GameType: drop, State>(
+        self: &mut Game<GameType, State>,
         games_pack: &mut GamesPack,
         player: &Account,
-        _: GAME_TYPE,
+        _: GameType,
     ) {
         assert!(self.is_started, ENotStarted);
         assert!(!self.is_gameover, EGameAlreadyOver);
@@ -326,15 +326,15 @@ module sui_games::game {
 
         self.is_gameover = true;
 
-        games_pack::player_draw<GAME_TYPE>(games_pack, self.player1);
-        games_pack::player_draw<GAME_TYPE>(games_pack, self.player2);
+        games_pack::player_draw<GameType>(games_pack, self.player1);
+        games_pack::player_draw<GameType>(games_pack, self.player2);
 
-        event::emit(GameDrawn<GAME_TYPE> {game_id: object::uid_to_inner(&self.id)});
+        event::emit(GameDrawn<GameType> {game_id: object::uid_to_inner(&self.id)});
 
     }
 
-    public fun suggest_draw<GAME_TYPE, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun suggest_draw<GameType, State>(
+        self: &mut Game<GameType, State>,
         games_pack: &mut GamesPack,
         player: &Account,
     ) {
@@ -350,15 +350,15 @@ module sui_games::game {
         self.suggested_draw_mask = self.suggested_draw_mask | (1 << (player_num - 1));
         if (self.suggested_draw_mask == 3) {
             self.is_gameover = true;
-            games_pack::player_draw<GAME_TYPE>(games_pack, self.player1);
-            games_pack::player_draw<GAME_TYPE>(games_pack, self.player2);
-            event::emit(GameDrawn<GAME_TYPE> {game_id: object::uid_to_inner(&self.id)});
+            games_pack::player_draw<GameType>(games_pack, self.player1);
+            games_pack::player_draw<GameType>(games_pack, self.player2);
+            event::emit(GameDrawn<GameType> {game_id: object::uid_to_inner(&self.id)});
         }
     }
 
 
-    public fun withdraw<GAME_TYPE, STATE>(
-        self: &mut Game<GAME_TYPE, STATE>,
+    public fun withdraw<GameType, State>(
+        self: &mut Game<GameType, State>,
         player: &Account,
         ctx: &mut TxContext
     ): Coin<SUI> {
@@ -396,11 +396,11 @@ module sui_games::game {
         coin::from_balance(balance::withdraw_all(&mut self.bet), ctx)
     }
 
-    public fun delete_game<GAME_TYPE, STATE>(
-        self: Game<GAME_TYPE, STATE>,
+    public fun delete_game<GameType, State>(
+        self: Game<GameType, State>,
         games_pack: &mut GamesPack,
         player: &Account
-    ): STATE {
+    ): State {
         assert!(self.is_gameover, EGameNotOver);
         let player = object::id_address(player);
         assert!(is_player(&self, player), EWrongPlayer);
@@ -411,9 +411,9 @@ module sui_games::game {
             assert!(player == self.player2, ENotWinner);
         };
 
-        games_pack::remove_game<GAME_TYPE>(games_pack, object::uid_to_inner(&self.id));
+        games_pack::remove_game<GameType>(games_pack, object::uid_to_inner(&self.id));
 
-        event::emit(GameDeleted<GAME_TYPE> {game_id: object::uid_to_inner(&self.id)});
+        event::emit(GameDeleted<GameType> {game_id: object::uid_to_inner(&self.id)});
 
         let Game {
             id,
@@ -439,14 +439,14 @@ module sui_games::game {
 
     // === Public-View Functions ===
 
-    public fun player_num<GAME_TYPE, STATE>(
-        self: &Game<GAME_TYPE, STATE>
+    public fun player_num<GameType, State>(
+        self: &Game<GameType, State>
     ): u8 {
         if (self.is_first_player_turn) 1 else 2
     }
 
-    public fun turn_number<GAME_TYPE, STATE>(
-        self: &Game<GAME_TYPE, STATE>
+    public fun turn_number<GameType, State>(
+        self: &Game<GameType, State>
     ): u32 {
         self.turn_number
     }
@@ -457,7 +457,7 @@ module sui_games::game {
     // === Public-Friend Functions ===
 
     // === Private Functions ===
-    fun is_player<GAME_TYPE, STATE>(self: &Game<GAME_TYPE, STATE>, player_address: address): bool {
+    fun is_player<GameType, State>(self: &Game<GameType, State>, player_address: address): bool {
         player_address == self.player1 || player_address == self.player2
     }
 

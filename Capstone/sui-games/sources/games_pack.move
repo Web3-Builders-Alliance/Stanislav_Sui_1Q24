@@ -67,14 +67,14 @@ module sui_games::games_pack {
     // === Public-Mutative Functions ===
 
     // === Public-View Functions ===
-    public fun has_game<GAME_TYPE>(self: &GamesPack): bool {
-        let game_type = type_name::get<GAME_TYPE>();
+    public fun has_game<GameType>(self: &GamesPack): bool {
+        let game_type = type_name::get<GameType>();
         vec_map::contains(&self.game_types, &game_type)
     }
 
     // === Admin Functions ===
-    public fun add_game_type<GAME_TYPE: drop>(_: &AdminCap, self: &mut GamesPack, ctx: &mut TxContext) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public fun add_game_type<GameType: drop>(_: &AdminCap, self: &mut GamesPack, ctx: &mut TxContext) {
+        let game_type = type_name::get<GameType>();
         assert!(!vec_map::contains(&self.game_types, &game_type), EGameAlreadyAdded);
         vec_map::insert(&mut self.game_types, game_type, GameStats {games_played: 0});
         vec_map::insert(&mut self.scores, game_type, table::new(ctx));
@@ -92,8 +92,8 @@ module sui_games::games_pack {
         vec_map::insert(&mut self.games, type_name::get<NEW_TYPE>(), games);
     }
 
-    public fun delete_game_type<GAME_TYPE: drop>(_: &AdminCap, self: &mut GamesPack) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public fun delete_game_type<GameType: drop>(_: &AdminCap, self: &mut GamesPack) {
+        let game_type = type_name::get<GameType>();
         assert!(vec_map::contains(&self.game_types, &game_type), EGameDoesNotExist);
         vec_map::remove(&mut self.game_types, &game_type);
         let (_, scores) = vec_map::remove(&mut self.scores, &game_type);
@@ -103,24 +103,24 @@ module sui_games::games_pack {
     }
 
     // === Public-Friend Functions ===
-    public(friend) fun add_game<GAME_TYPE>(self: &mut GamesPack, game_id: ID) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public(friend) fun add_game<GameType>(self: &mut GamesPack, game_id: ID) {
+        let game_type = type_name::get<GameType>();
         if (!vec_map::contains(&self.game_types, &game_type)) return;
 
         let  games = vec_map::get_mut(&mut self.games, &game_type);
         table::add(games, game_id, true);
     }
 
-    public(friend) fun remove_game<GAME_TYPE>(self: &mut GamesPack, game_id: ID) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public(friend) fun remove_game<GameType>(self: &mut GamesPack, game_id: ID) {
+        let game_type = type_name::get<GameType>();
         if (!vec_map::contains(&self.game_types, &game_type)) return;
 
         let  games = vec_map::get_mut(&mut self.games, &game_type);
         table::remove(games, game_id);
     }
 
-    public(friend) fun player_win<GAME_TYPE>(self: &mut GamesPack, player: address) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public(friend) fun player_win<GameType>(self: &mut GamesPack, player: address) {
+        let game_type = type_name::get<GameType>();
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
@@ -131,8 +131,8 @@ module sui_games::games_pack {
         }
     }
 
-    public(friend) fun player_lose<GAME_TYPE>(self: &mut GamesPack, player: address) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public(friend) fun player_lose<GameType>(self: &mut GamesPack, player: address) {
+        let game_type = type_name::get<GameType>();
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
@@ -143,8 +143,8 @@ module sui_games::games_pack {
         }
     }
 
-    public(friend) fun player_draw<GAME_TYPE>(self: &mut GamesPack, player: address) {
-        let game_type = type_name::get<GAME_TYPE>();
+    public(friend) fun player_draw<GameType>(self: &mut GamesPack, player: address) {
+        let game_type = type_name::get<GameType>();
         if (!vec_map::contains(&self.game_types, &game_type)) return;
         let player_stats = vec_map::get_mut(&mut self.scores, &game_type);
         if (!table::contains(player_stats, player)) {
